@@ -54,7 +54,7 @@ npm run preview
 
 ## Referências visuais utilizadas
 
-1. Vídeo animado de cartões fornecido pelo autor — Hero com movimento real, em loop e parallax ao rolar a página.
+1. Vídeo animado de cartões feito por IA — Hero com movimento real, em loop e parallax ao rolar a página.
 2. Imagem original de várias mãos segurando um cartão Nubank — seção de diversidade e inclusão.
 3. Imagem do smartphone com cartões Nubank Ultravioleta — seção Sobre.
 4. Seção de biodiversidade — imagem conceitual de floresta criada para o projeto e armazenada localmente.
@@ -74,12 +74,6 @@ npm run preview
 - Links externos direcionam apenas para o domínio oficial do Nubank/Nu.
 - Avisos explícitos de que o projeto é conceitual e não oficial.
 
-## Cuidados antes de publicar
-
-- Confirmar atualização, elegibilidade, termos, valores e benefícios diretamente no site oficial.
-- Revisar direitos de uso da marca, logo, fotografias e vídeo. O fornecimento dos arquivos para prototipação não transfere automaticamente direitos de publicação comercial.
-- Obter autorização quando aplicável e manter o aviso de estudo conceitual, nunca utilizar domínios que possam ser confundidos com o banco.
-- Testar em navegadores/dispositivos reais e realizar auditoria de acessibilidade/performance antes de disponibilizar publicamente.
 
 ## Fontes institucionais consultadas em 23/11/2026
 
