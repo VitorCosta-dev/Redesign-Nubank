@@ -151,11 +151,17 @@ function Header() {
   )
 }
 
+const heroMobileQuery = '(max-width: 740px), (pointer: coarse) and (max-height: 540px)'
+
 function Hero() {
   const heroRef = useRef(null)
   const videoRef = useRef(null)
-  const [playing, setPlaying] = useState(true)
+  const [playing, setPlaying] = useState(false)
+  const [mobile, setMobile] = useState(() => window.matchMedia(heroMobileQuery).matches)
   const reduceMotion = useReducedMotion()
+  const animateHero = !reduceMotion && !mobile
+  const autoplay = !reduceMotion && navigator.connection?.saveData !== true
+  const videoSrc = mobile ? '/assets/cartoes-animados-mobile.mp4' : '/assets/cartoes-animados.mp4'
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 68, damping: 26, mass: 0.55, restDelta: 0.001 })
   const videoScale = useTransform(smoothProgress, [0, 0.62, 1], [1, 1.045, 1.09])
@@ -172,18 +178,24 @@ function Hero() {
   const actionsY = useTransform(smoothProgress, [0.29, 0.51], [24, 0])
 
   useEffect(() => {
-    const prefersSavingData = navigator.connection?.saveData === true
-    if ((reduceMotion || prefersSavingData) && videoRef.current) {
-      videoRef.current.pause()
-      setPlaying(false)
-    }
-  }, [reduceMotion])
+    const media = window.matchMedia(heroMobileQuery)
+    const update = () => setMobile(media.matches)
+    media.addListener(update)
+    return () => media.removeListener(update)
+  }, [])
+
+  useEffect(() => {
+    if (!autoplay) videoRef.current?.pause()
+  }, [autoplay])
 
   async function toggleVideo() {
     const video = videoRef.current
     if (!video) return
     if (video.paused) {
-      try { await video.play(); setPlaying(true) } catch { setPlaying(false) }
+      try {
+        if (!video.getAttribute('src')) video.src = videoSrc
+        await video.play()
+      } catch { setPlaying(false) }
     } else {
       video.pause()
       setPlaying(false)
@@ -193,35 +205,34 @@ function Hero() {
   return (
     <section className="hero" ref={heroRef} id="inicio" aria-labelledby="hero-title">
       <div className="hero-sticky">
-      <motion.div className="hero-video-shell" style={reduceMotion ? undefined : { scale: videoScale }} aria-hidden="true">
+      <motion.div className="hero-video-shell" style={animateHero ? { scale: videoScale } : undefined} aria-hidden="true">
         <video
           ref={videoRef}
           className="hero-video"
-          autoPlay={!reduceMotion}
+          key={videoSrc}
+          src={autoplay ? videoSrc : undefined}
+          autoPlay={autoplay}
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           poster="/assets/cartoes-poster.jpg"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-        >
-          <source media="(max-width: 740px)" src="/assets/cartoes-animados-mobile.mp4" type="video/mp4" />
-          <source src="/assets/cartoes-animados.mp4" type="video/mp4" />
-        </video>
+        />
       </motion.div>
-      <motion.div className="hero-shade" style={reduceMotion ? undefined : { opacity: shadeOpacity }} aria-hidden="true" />
+      <motion.div className="hero-shade" style={!animateHero ? undefined : { opacity: shadeOpacity }} aria-hidden="true" />
       <div className="hero-noise" aria-hidden="true" />
       <div className="container hero-content">
-        <motion.div className="hero-copy" style={reduceMotion ? undefined : { opacity: copyExitOpacity }}>
-          <motion.p className="eyebrow eyebrow--light" style={reduceMotion ? undefined : { opacity: eyebrowOpacity, y: eyebrowY }}><span className="glow-dot" /> UMA NOVA PERSPECTIVA DO EXTRAORDINÁRIO</motion.p>
-          <motion.h1 id="hero-title" style={reduceMotion ? undefined : { opacity: titleOpacity, y: titleY, filter: titleBlur }}>
+        <motion.div className="hero-copy" style={!animateHero ? undefined : { opacity: copyExitOpacity }}>
+          <motion.p className="eyebrow eyebrow--light" style={!animateHero ? undefined : { opacity: eyebrowOpacity, y: eyebrowY }}><span className="glow-dot" /> UMA NOVA PERSPECTIVA DO EXTRAORDINÁRIO</motion.p>
+          <motion.h1 id="hero-title" style={!animateHero ? undefined : { opacity: titleOpacity, y: titleY, filter: titleBlur }}>
             O seu mundo merece ir <span className="serif-accent">além.</span>
           </motion.h1>
-          <motion.p className="hero-description" style={reduceMotion ? undefined : { opacity: descriptionOpacity, y: descriptionY }}>
+          <motion.p className="hero-description" style={!animateHero ? undefined : { opacity: descriptionOpacity, y: descriptionY }}>
             Mais experiências. Mais possibilidades. Uma nova forma de olhar para o que realmente importa.
           </motion.p>
-          <motion.div className="hero-actions" style={reduceMotion ? undefined : { opacity: actionsOpacity, y: actionsY }}>
+          <motion.div className="hero-actions" style={!animateHero ? undefined : { opacity: actionsOpacity, y: actionsY }}>
             <a href="#experiencia" className="btn btn--white">Explore a experiência <ArrowUpRight size={18} /></a>
             <a href="#beneficios" className="text-link text-link--light">Conheça os benefícios <ArrowRight size={17}/></a>
           </motion.div>
